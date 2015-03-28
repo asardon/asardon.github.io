@@ -1,10 +1,10 @@
 ---
 layout:     post
-title:      "Baum Welch Algorithm"
-subtitle:   "Part 2"
-date:       2015-01-23 12:00:00
+title:      "The Forward Algorithm and the Log-Exp Trick"
+subtitle:   "How to avoid underflows"
+date:       2015-02-15 12:00:00
 author:     "Aetienne Sardon"
-header-img: "img/home-bg.jpg"
+header-img: ""
 ---
 When implementing the forward algorithm, a problem bound to arise is that of underflow. 
 In an [earlier post](http://asardon.github.io/) we discussed
