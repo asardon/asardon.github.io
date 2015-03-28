@@ -6,7 +6,6 @@ date:       2015-01-23 12:00:00
 author:     "Aetienne Sardon"
 header-img: "img/home-bg.jpg"
 ---
-# Intro
 <p>In the last post we went through the derivation of the Baum-Welch algorithm, 
 which allows us to estimate/learn the parameters of a Hidden Markov Model (HMM). 
 In this post I would like to illustrate how we can translate our HMM into Python code. So let's dive right into it!</p>
@@ -96,7 +95,7 @@ $$
 
 <p>We see that the forward and backward probabilities $\alpha_i(t)$ and $\beta_i(t)$ basically show up in every equation, so let's start defining functions for these.</p>
 
-# Forward/Backward Probabilities
+## Forward/Backward Probabilities
 <p>Before we can continue, there's an important remark to be made. When calculating the forward and backward probabilities we will sooner or later encounter the problem of underflow. Underflow occurs when we operate with numbers that are too small to be represented by our computer. When calculating the forward/backward probabilities we recursively multiply numbers that are smaller than one. If we do that often enough the resulting values will become very small pretty fast, e.g. for a non trivial dataset with a sequence length of $T=1000$ we might be working with numbers in the order of $\Pr(\cdot)^{1000} \propto 10^{-1000}$. Numpy supports double precision floats (float64), which have 1 sign bit, 11 exponent bits, 52 mantissa bits. So the exponent bit can store $2^{11}-2=2048-2=2046$ different values (subtracting 2 because the smallest and largest exponent are used to represent signed zero and infinity) such that the representable values are in the range of $[2^{-1022}, 2^{+1023}]\approx[10^{-307},10^{+308}]$ (when using subnormal numbers actually $[10^{-324},10^{+308}]$). Obviously, in our example $10^{-1000}$ will cause an underflow. But luckily, there is a way how we can solve this problem. One way is to rescale the forward/backward probabilities, i.e.:</p>
 
 $$
@@ -146,7 +145,7 @@ It can be shown that the update equations remain unchanged when using the rescal
 
 <p>Basically, we first initialize an empty numpy array and then successively fill in the forward/backward probabilities by iterating over the observations and different states.</p> 
 
-# Helper Variables
+## Helper Variables
 <p>Now that we've defined functions for $\hat{\alpha}_i(t)$ and $\hat{\beta}_i(t)$ we can use these values as an input for calculating $\gamma_i(t)$:</p>
 
 	class HMM():
@@ -181,7 +180,7 @@ Here we iterate through the number of states and use the vectorized numpy multip
 
 Here, we again use additive smoothing.
 
-# Updating Model Parameters
+## Updating Model Parameters
 Based on $\hat{\alpha}\_i(t), \hat{\beta}\_i(t), \gamma\_i(t), \gamma\_{i,l}(t), b\_{i,l}(o\_t)$ and $b\_{i}(o\_t)$ we can now finally determine the parameter updates for $\pi\_{i}, a\_{i,j}, w\_{i,l}, \mu\_{i,l}$ and $\sigma\_{i,l}^2$.
 
 	class HMM():
@@ -223,7 +222,7 @@ Based on $\hat{\alpha}\_i(t), \hat{\beta}\_i(t), \gamma\_i(t), \gamma\_{i,l}(t),
 
 Here we pretty much simply implement the previously defined parameter update equations. For the variance we also handle cases where the variance might be zero due to zero-frequency problems.  
 
-# Toy Example
+## Toy Example
 Let's create some dummy data to test our Python HMM. Therefore let's define the true model parameters $\pi\_{i}, a\_{i,j}, w\_{i,l}, \mu\_{i,l}$ and $\sigma\_{i,l}^2$ from which we want to sample.
 
 	np.random.seed(2)
@@ -341,5 +340,5 @@ Now let's make some prior guess of the model parameters and check how well the B
 
 Well, we got the the initial state distribution right, however, the transition probabilities seem a little extrem. The mixture weights and variances seem to be a little bit off but then the mixture means seem quite in line with the true model parameters. Note that we may be able to improve our results by altering our prior guesses. All in all the results of the Baum-Welch algorithm suggest that we should run several independent training sessions in order to receive more reliable estimates.
   
-# References
+## References
 [1] Rabiner, L.R. (1989): "A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition", Proceedings of the IEEE, Vol. 77, No. 2.

@@ -6,8 +6,6 @@ date:       2015-01-20 12:00:00
 author:     "Aetienne Sardon"
 header-img: "img/home-bg.jpg"
 ---
-
-# Intro
 <p>Today I would like to review the Baum-Welch algorithm, which is used to learn the parameters of a Hidden Markov Model (HMM). Recall that a HMM is defined by $\lambda=(S,V,A,B,\pi)$ where</p>
 * $\mathcal{S}:=\{1,...,n\}$ are the possible hidden states that the random variable $S_t$ can assume at each time point $t$
 * $\mathcal{O}:= \mathbb R$ is the codomain of possible observable values that the random variable $O_t$ can obtain (here we assume continuous values)
@@ -22,7 +20,7 @@ $$ X_{i:j} := ( X_i, X_{i+1}, ..., X_j ) ,\quad i<j$$
 
 <p>Furthermore, before we start with the Baum-Welch algorithm we need to recap on the forward-backward algorithm which we will use later on. As the name suggests, the forward-backward algorithm consists of two steps, i.e. the forward and backward procedure from which we obtain the so called forward $\alpha_i(t)$ and backward probabilities $\beta_i(t)$.</p>
 
-# Forward Procedure
+## Forward Procedure
 <p>In the forward procedure we determine the probability of observing the sequence $o_1,o_2,...,o_t$ and ending in the hidden state $S_t=i$ at time $t$. In other words:</p>
 
 $$ \alpha_i(t) := \Pr(O_{1:t}=o_{1:t}, S_t=i | \theta) $$
@@ -45,7 +43,7 @@ $$\alpha_i(1) = \pi_i b_i(o_1) $$
 <p>Note: In line 3 we add $S_{t-1}=j$ to the joint distribution and sum over all $j=1,...,n$ (marginalizing out) such that the equality remains valid. In line 4 and 5 we apply the chain rule and in line 6 we use the fact that $o_t$ is conditionally independent of $S_{t-1}$ given $S_t$.</p>
 
 
-# Backward Procedure
+## Backward Procedure
 <p>The backward procedure returns the probability of observing the sequence $o_{t+1},o_{t+2},...,o_T$ given that the HMM is in state $s_i$ at time $t$. The backward probability is defined as:</p>
 
 $$ \beta_i(t) := \Pr(O_{t+1:T}=o_{t+1:T} | S_t=i, \theta) $$
@@ -72,7 +70,7 @@ $$\beta_i(T)=1$$
 
 <p>Note: In line 2 we add $S_{t+1}=j$ to the joint distribution and sum over all $j=1,...,n$ (marginalizing out) such that the equality remains valid. In line 3 we use the fact that $o_{t+1:T}$ is conditionally independent of $S_t$ given $S_{t+1}$. In line 5 we use the chain rule. In line 6 we rearrange and drop $o_{t+2:T}$ out of the condition because of the independence of observations.</p>
 
-# Finding HMM Parameters
+## Finding HMM Parameters
 <p>Ultimately, we're interested in finding the maximum likelihood estimate (MLE) $\theta^{*}$, i.e.</p>
 $$\theta^{*}=\operatorname*{arg\,max}_{\theta} \mathcal{L}(\theta|O_{1:T},S_{1:T})$$
 
@@ -165,7 +163,7 @@ $$
 \end{eqnarray}
 $$
 
-### Transition Probabilities
+## Transition Probabilities
  <p>Now, we take the partial derivative of $\Lambda(\theta, \theta^{(k)})$ with respect to $a_{h,l}$:</p>
 $$
 \begin{eqnarray} 
@@ -196,7 +194,7 @@ a_{h,l} &=& \sum_{t=1}^{T-1} \frac{ \Pr(S_{t}=h, S_{t+1}=l, o_{1:T}| \theta^{(k)
 $$
 
 
-### Gaussian Mixture Parameters
+## Gaussian Mixture Parameters
  <p>For the Gaussian Mixture model we need to estimate for each hidden state $i=1,...,n$ the weights $w_{i,l}$ as well as the distribution parameters $\mu_{i,l}, \sigma_{i,l}^2$ for each mixture component $l=1,...,m$. Let's first find the optimal weights by taking the partial derivative of $\Lambda(\theta, \theta^{(k)})$ with respect to $w_{i,l}$:</p>
 $$
 \begin{eqnarray} 
@@ -259,7 +257,7 @@ $$
 \end{eqnarray} 
 $$
 
-### Parameter Updates
+## Parameter Updates
 <p>We can define some 'helper' variables to make the parameter updates easier:</p>
 $$
 \begin{eqnarray} 
