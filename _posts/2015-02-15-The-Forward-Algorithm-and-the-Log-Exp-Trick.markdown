@@ -50,7 +50,7 @@ or in log-domain:
 
 [2] provides nice definitions of "extended log/exp" functions that we can implement in order to compute $\log \alpha(i,1)$. In Python, these can be written as:
 
-~~~ python
+{% syntax python %}
 import math
 import numpy as np
 from scipy.stats import norm
@@ -100,7 +100,7 @@ def get_elnprod(log_x, log_y):
 		return "LOGZERO"
 	else:
 		return log_x + log_y
-~~~
+{% endsyntax %}
 
 Note that we do not use NumPy in order to work with lists that are able to handle different data types, such that we can identify "LOGZERO" values as strings. Although this can also be accomplished in NumPy it is not as straightforward as using the built-in list datatype. 
 
