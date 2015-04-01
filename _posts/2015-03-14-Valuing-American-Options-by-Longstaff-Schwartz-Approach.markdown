@@ -13,14 +13,14 @@ and then recursively determine the expected continuation value by regressing the
 Based on the expected continuation value one can then decide whether to early exercise or not.
 
 The steps of the valuation algorithm are as follows:
-- model stock prices (e.g. by Brownian motion)
-- determine the options final payoffs
-- iterate backwards through the simulated stock price path
-- determine in-the-money (ITM) option values of current period
-- regress current ITM option value on discounted future option value (e.g. by quadratic regression $Y = a + bX + cX^2$
-- if current ITM option value (early exercise value) is greater than the value from continuation (fitted value from regression), then do early exercise
-- based on the recursion, determine optimal exercise times
-- based on exercise times, determine expected payoff and take the average as the final option price
+* model stock prices (e.g. by Brownian motion)
+* determine the options final payoffs
+* iterate backwards through the simulated stock price path
+* determine in-the-money (ITM) option values of current period
+* regress current ITM option value on discounted future option value (e.g. by quadratic regression $Y = a + bX + cX^2$
+* if current ITM option value (early exercise value) is greater than the value from continuation (fitted value from regression), then do early exercise
+* based on the recursion, determine optimal exercise times
+* based on exercise times, determine expected payoff and take the average as the final option price
 
 Below I have implemented the Longstaff-Schwartz approach in Python. At the bottom you can
 also see that I have used the same example as proposed in their paper. When running the module
