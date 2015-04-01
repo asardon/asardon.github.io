@@ -7,7 +7,7 @@ author:     "Aetienne Sardon"
 header-img: ""
 ---
 When implementing the forward algorithm, a problem bound to arise is that of underflow. 
-In an [earlier post](http://asardon.github.io/) we discussed
+In an [earlier post](http://asardon.github.io/2015/01/23/Baum-Welch-Algorithm-Part-2/) we discussed
 how we can avoid underflows by using a scaling factor as proposed in [1]. However,
 in this post we will show an alternative solution to the underflow problem by utilizing the
 so called log-exp trick. A paper by [2] nicely explains how the log-exp can
@@ -52,6 +52,7 @@ or in log-domain:
 
 [2] provides nice definitions of "extended log/exp" functions that we can implement in order to compute $\log \alpha(i,1)$. In Python, these can be written as:
 
+```python
 	import math
 	import numpy as np
 	from scipy.stats import norm
@@ -101,6 +102,7 @@ or in log-domain:
 	        return "LOGZERO"
 	    else:
 	        return log_x + log_y
+```
 
 Note that we do not use NumPy in order to work with lists that are able to handle different data types, such that we can identify "LOGZERO" values as strings. Although this can also be accomplished in NumPy it is not as straightforward as using the built-in list datatype. 
 
@@ -132,6 +134,7 @@ In order to test the log forward algorithm we also need a function to calculate 
 	    return out
 
 And lastly for comparison, the usual forward algorithm:
+
 	def get_alpha(pi, b, a):
 	    num_states, T = len(b), len(b[0])
 	    alpha = [[0] * T] * num_states 
@@ -167,4 +170,5 @@ When running this test, one can see that "alpha2" will quickly return $+\infty$ 
 
 ## References
 [1] Rabiner, L.R. (1989): "A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition", Proceedings of the IEEE, Vol. 77, No. 2.
+
 [2] Mann, T.P. (2006): "Numerically stable hidden markov model implementation", World Wide Web. Available in: http://bozeman.genome.washington.edu/compbio/mbt599_2006/hmm_scaling_revised.pdf
