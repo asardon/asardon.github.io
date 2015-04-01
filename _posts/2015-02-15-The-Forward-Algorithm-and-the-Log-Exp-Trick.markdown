@@ -106,7 +106,7 @@ Note that we do not use NumPy in order to work with lists that are able to handl
 
 We can then use these "extended log/exp" functions for the forward algorithm in the following manner:
 
-~~~ python
+{% highlight python %}
 def get_log_alpha(ln_pi, ln_b, ln_a):
 	num_states, T = len(ln_b), len(ln_b[0])
 	ln_alpha = [[0] * T] * num_states 
@@ -120,11 +120,11 @@ def get_log_alpha(ln_pi, ln_b, ln_a):
 				ln_alpha[i][t] = get_elnsum(ln_alpha[i][t], get_elnprod(ln_alpha[i][t-1], ln_a[i][j]))
 			ln_alpha[j][t] = get_elnprod(ln_alpha[i][t], ln_b[j][t])
 	return ln_alpha
-~~~
+{% endhighlight %}
 
 In order to test the log forward algorithm we also need a function to calculate the emission probabilities. For a single Gaussian emission source, we get:
 
-~~~ python
+{% highlight python %}
 def get_single_gaussian_emission_probs(obs, mu, sd):
 	num_states, T = len(mu), len(obs)
 	out = [[0.0] * T] * num_states 
@@ -133,11 +133,11 @@ def get_single_gaussian_emission_probs(obs, mu, sd):
 		for i in range(num_states):
 			out[i][t] = norm.pdf(obs[t], mu[i], sd[i]) #+ 1.0e-200
 	return out
-~~~
+{% endhighlight %}
 
 And lastly for comparison, the usual forward algorithm:
 
-~~~ python
+{% highlight python %}
 def get_alpha(pi, b, a):
 	num_states, T = len(b), len(b[0])
 	alpha = [[0] * T] * num_states 
@@ -151,11 +151,11 @@ def get_alpha(pi, b, a):
 				alpha[i][t] += alpha[i][t-1] * a[i][j]
 			alpha[j][t] *= b[j][t]
 	return alpha    
-~~~
+{% endhighlight %}
 	   
 Finally, testing the above functions with synthetic data can be done as follows:
 
-~~~ python
+{% highlight python %}
 o = np.random.normal(0.05, 0.02, 10000)
 pi = [0.2, 0.8]
 b = get_single_gaussian_emission_probs(o, [0.03, 0.05], [0.01, 0.02]) 
@@ -170,7 +170,7 @@ ln_a = get_eln_list2d(a)
 
 alpha1 = get_log_alpha(ln_pi, ln_b, ln_a)
 alpha2 = get_eln_list2d(get_alpha(pi, b, a))
-~~~
+{% endhighlight %}
 
 When running this test, one can see that "alpha2" will quickly return $+\infty$ values (in my case after the 135th element) while "alpha1" yields more precise results throughout the entire sequence. Thus, the exp-log trick can be used to solve the problem of underflow and allows us to use reasonable forward probabilities for HMM parameter estimation. I hope you found the post helpful!
 
