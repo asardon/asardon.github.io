@@ -52,119 +52,127 @@ or in log-domain:
 
 [2] provides nice definitions of "extended log/exp" functions that we can implement in order to compute $\log \alpha(i,1)$. In Python, these can be written as:
 
-```python
-	import math
-	import numpy as np
-	from scipy.stats import norm
+~~~ python
+import math
+import numpy as np
+from scipy.stats import norm
+
+def get_eexp(x):
+	if(x=="LOGZERO"):
+		return 0
+	else:
+		return math.exp(x)
+		
+def get_eln(x):
+	if(x==0):
+		return "LOGZERO"
+	elif(x>0):
+		return math.log(x)
+	else:
+		print("negative input error")
+
+def get_eln_list(x_list):
+	_out = [0.0] * len(x_list)
 	
-	def get_eexp(x):
-	    if(x=="LOGZERO"):
-	        return 0
-	    else:
-	        return math.exp(x)
-	        
-	def get_eln(x):
-	    if(x==0):
-	        return "LOGZERO"
-	    elif(x>0):
-	        return math.log(x)
-	    else:
-	        print("negative input error")
+	for i in range(len(x_list)):
+		_out[i] = get_eln(x_list[i])
+	return _out
 	
-	def get_eln_list(x_list):
-	    _out = [0.0] * len(x_list)
-	    
-	    for i in range(len(x_list)):
-	        _out[i] = get_eln(x_list[i])
-	    return _out
-	    
-	def get_eln_list2d(x_list2d):
-	    _out = [[0.0] * len(x_list2d[0])] * len(x_list2d)
-	    
-	    for i in range(len(x_list2d)):
-	        _out[i] = get_eln_list(x_list2d[i])
-	    return _out
+def get_eln_list2d(x_list2d):
+	_out = [[0.0] * len(x_list2d[0])] * len(x_list2d)
 	
-	def get_elnsum(eln_x, eln_y):
-	    if(eln_x=="LOGZERO" or eln_y=="LOGZERO"):
-	        if(eln_x=="LOGZERO"):
-	            return eln_y
-	        else:
-	            return eln_x
-	    else:
-	        if(eln_x > eln_y):
-	            return eln_x + get_eln(1 + math.exp(eln_y - eln_x))
-	        else:
-	            return eln_y + get_eln(1 + math.exp(eln_x - eln_y))
-	
-	def get_elnprod(log_x, log_y):
-	    if(log_x=="LOGZERO" or log_y=="LOGZERO"):
-	        return "LOGZERO"
-	    else:
-	        return log_x + log_y
-```
+	for i in range(len(x_list2d)):
+		_out[i] = get_eln_list(x_list2d[i])
+	return _out
+
+def get_elnsum(eln_x, eln_y):
+	if(eln_x=="LOGZERO" or eln_y=="LOGZERO"):
+		if(eln_x=="LOGZERO"):
+			return eln_y
+		else:
+			return eln_x
+	else:
+		if(eln_x > eln_y):
+			return eln_x + get_eln(1 + math.exp(eln_y - eln_x))
+		else:
+			return eln_y + get_eln(1 + math.exp(eln_x - eln_y))
+
+def get_elnprod(log_x, log_y):
+	if(log_x=="LOGZERO" or log_y=="LOGZERO"):
+		return "LOGZERO"
+	else:
+		return log_x + log_y
+~~~
 
 Note that we do not use NumPy in order to work with lists that are able to handle different data types, such that we can identify "LOGZERO" values as strings. Although this can also be accomplished in NumPy it is not as straightforward as using the built-in list datatype. 
 
 We can then use these "extended log/exp" functions for the forward algorithm in the following manner:
 
-	def get_log_alpha(ln_pi, ln_b, ln_a):
-	    num_states, T = len(ln_b), len(ln_b[0])
-	    ln_alpha = [[0] * T] * num_states 
-	
-	    for i in range(num_states):
-	        ln_alpha[i][0] = get_elnprod(ln_pi[i], ln_b[i][0])
-	        
-	    for t in range(1, T):
-	        for j in range(num_states):
-	            for i in range(num_states):
-	                ln_alpha[i][t] = get_elnsum(ln_alpha[i][t], get_elnprod(ln_alpha[i][t-1], ln_a[i][j]))
-	            ln_alpha[j][t] = get_elnprod(ln_alpha[i][t], ln_b[j][t])
-	    return ln_alpha
+~~~ python
+def get_log_alpha(ln_pi, ln_b, ln_a):
+	num_states, T = len(ln_b), len(ln_b[0])
+	ln_alpha = [[0] * T] * num_states 
+
+	for i in range(num_states):
+		ln_alpha[i][0] = get_elnprod(ln_pi[i], ln_b[i][0])
+		
+	for t in range(1, T):
+		for j in range(num_states):
+			for i in range(num_states):
+				ln_alpha[i][t] = get_elnsum(ln_alpha[i][t], get_elnprod(ln_alpha[i][t-1], ln_a[i][j]))
+			ln_alpha[j][t] = get_elnprod(ln_alpha[i][t], ln_b[j][t])
+	return ln_alpha
+~~~
 
 In order to test the log forward algorithm we also need a function to calculate the emission probabilities. For a single Gaussian emission source, we get:
 
-	def get_single_gaussian_emission_probs(obs, mu, sd):
-	    num_states, T = len(mu), len(obs)
-	    out = [[0.0] * T] * num_states 
-	
-	    for t in range(T):
-	        for i in range(num_states):
-	            out[i][t] = norm.pdf(obs[t], mu[i], sd[i]) #+ 1.0e-200
-	    return out
+~~~ python
+def get_single_gaussian_emission_probs(obs, mu, sd):
+	num_states, T = len(mu), len(obs)
+	out = [[0.0] * T] * num_states 
+
+	for t in range(T):
+		for i in range(num_states):
+			out[i][t] = norm.pdf(obs[t], mu[i], sd[i]) #+ 1.0e-200
+	return out
+~~~
 
 And lastly for comparison, the usual forward algorithm:
 
-	def get_alpha(pi, b, a):
-	    num_states, T = len(b), len(b[0])
-	    alpha = [[0] * T] * num_states 
-	    
-	    for i in range(num_states):
-	        alpha[i][0] = pi[i] * b[i][0]
-	        
-	    for t in range(1, T):
-	        for j in range(num_states):
-	            for i in range(num_states):
-	                alpha[i][t] += alpha[i][t-1] * a[i][j]
-	            alpha[j][t] *= b[j][t]
-	    return alpha    
+~~~ python
+def get_alpha(pi, b, a):
+	num_states, T = len(b), len(b[0])
+	alpha = [[0] * T] * num_states 
+	
+	for i in range(num_states):
+		alpha[i][0] = pi[i] * b[i][0]
+		
+	for t in range(1, T):
+		for j in range(num_states):
+			for i in range(num_states):
+				alpha[i][t] += alpha[i][t-1] * a[i][j]
+			alpha[j][t] *= b[j][t]
+	return alpha    
+~~~
 	   
 Finally, testing the above functions with synthetic data can be done as follows:
 
-	o = np.random.normal(0.05, 0.02, 10000)
-	pi = [0.2, 0.8]
-	b = get_single_gaussian_emission_probs(o, [0.03, 0.05], [0.01, 0.02]) 
-	a = [
-	    [0.3, 0.7],
-	    [0.8, 0.2]
-	]
-	
-	ln_pi = get_eln_list(pi)
-	ln_b = get_eln_list2d(b)
-	ln_a = get_eln_list2d(a)
-	
-	alpha1 = get_log_alpha(ln_pi, ln_b, ln_a)
-	alpha2 = get_eln_list2d(get_alpha(pi, b, a))
+~~~ python
+o = np.random.normal(0.05, 0.02, 10000)
+pi = [0.2, 0.8]
+b = get_single_gaussian_emission_probs(o, [0.03, 0.05], [0.01, 0.02]) 
+a = [
+	[0.3, 0.7],
+	[0.8, 0.2]
+]
+
+ln_pi = get_eln_list(pi)
+ln_b = get_eln_list2d(b)
+ln_a = get_eln_list2d(a)
+
+alpha1 = get_log_alpha(ln_pi, ln_b, ln_a)
+alpha2 = get_eln_list2d(get_alpha(pi, b, a))
+~~~
 
 When running this test, one can see that "alpha2" will quickly return $+\infty$ values (in my case after the 135th element) while "alpha1" yields more precise results throughout the entire sequence. Thus, the exp-log trick can be used to solve the problem of underflow and allows us to use reasonable forward probabilities for HMM parameter estimation. I hope you found the post helpful!
 
