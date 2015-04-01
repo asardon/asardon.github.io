@@ -100,7 +100,7 @@ def get_elnprod(log_x, log_y):
 		return "LOGZERO"
 	else:
 		return log_x + log_y
-{% endsyntax %}
+{% endhighlight %}
 
 Note that we do not use NumPy in order to work with lists that are able to handle different data types, such that we can identify "LOGZERO" values as strings. Although this can also be accomplished in NumPy it is not as straightforward as using the built-in list datatype. 
 
