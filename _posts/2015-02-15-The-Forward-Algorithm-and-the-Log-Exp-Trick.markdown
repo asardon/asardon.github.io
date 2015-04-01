@@ -19,19 +19,19 @@ Assume we would like to calculate the following quantity:
 
 \begin{equation}
 \begin{split}
-z = \log \sum_{i=1}^n exp\{x_i\}
+z = \log \sum_{i=1}^n \exp\{x_i\}
 \end{split}
 \end{equation}
 
-For an example, if $x_1=-1000, x_2=-999$ and $x_3=-998$ then $z=\log (exp\{-1000\} + exp\{-999\} + exp\{-998\} )$ will result in $z=\log (0 + 0 + 0 )=-\infty$. However, we can also use the following identity
+For an example, if $x_1=-1000, x_2=-999$ and $x_3=-998$ then $z=\log (\exp\{-1000\} + \exp\{-999\} + \exp\{-998\} )$ will result in $z=\log (0 + 0 + 0 )=-\infty$. However, we can also use the following identity
 
 \begin{equation}
 \begin{split}
-\log \sum_{i=1}^n exp\{x_i\} = a + \log \sum_{i=1}^n exp\{x_i - a\}
+\log \sum_{i=1}^n \exp\{x_i\} = a + \log \sum_{i=1}^n \exp\{x_i - a\}
 \end{split}
 \end{equation}
 
-where $a=\max_i\{x_i\}$. This means that the summands are shifted by the most significant $x_i$. This in turn allows us to get a more accurate result than $z=-\infty$. Applying the above mentioned identity results in $z=-998 + \log ( exp\{-2\} + exp\{-1\} + exp\{0\} )\approx-997.82$.
+where $a=\max_i\{x_i\}$. This means that the summands are shifted by the most significant $x_i$. This in turn allows us to get a more accurate result than $z=-\infty$. Applying the above mentioned identity results in $z=-998 + \log ( \exp\{-2\} + \exp\{-1\} + \exp\{0\} )\approx-997.82$.
 
 In the case of the forward algorithm, the following quantities need to be computed:
 
