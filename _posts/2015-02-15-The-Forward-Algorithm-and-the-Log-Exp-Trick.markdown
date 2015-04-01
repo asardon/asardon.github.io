@@ -50,7 +50,7 @@ or in log-domain:
 
 [2] provides nice definitions of "extended log/exp" functions that we can implement in order to compute $\log \alpha(i,1)$. In Python, these can be written as:
 
-{% syntax python %}
+{% highlight python %}
 import math
 import numpy as np
 from scipy.stats import norm
